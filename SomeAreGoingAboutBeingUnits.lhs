@@ -1,4 +1,4 @@
-1
+"1
 apricot trees exist, apricot trees exist
 
 2
@@ -15,7 +15,7 @@ doves exist, dreamers, and dolls;
 killers exist, and doves, and doves;
 haze, dioxin, and days; days
 exist, days and death; and poems
-exist; poems, days, death
+exist; poems, days, death"
 
 -Inger Christensen, \emph{Alphabet}
 
