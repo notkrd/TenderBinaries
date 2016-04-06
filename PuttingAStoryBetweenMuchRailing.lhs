@@ -5,22 +5,18 @@ kawazu tobikomu
 mizu no oto"
 -Matsuo Basho
 
-This code is disgusting and should be stopped
-
-I don't think I have anything else to say about it.
-
-Unfortunate plumbing, rusting below signification. It's too far down for
-me to polish up, make something story-shaped out of.
+This code is disgusting and should be stopped. Syllable counting is an aesthetically and spiritually bankrupt practice, and should be gently mocked. Nonetheless, here we are, counting syllables.
 
 \begin{code}
-module Syllables where
+
+module PuttingAStoryBetweenMuchRailing where
 
 import Data.Char
 
 en_vowels :: String
-en_vowels = ['a','e','i','o','u']
+en_vowels = "aeiou"
 en_consonants :: String
-en_consonants = ['b','c','d','f','g','h','j','k','l','m','n','p','q','r','s','t','v','w','x','y','z']
+en_consonants = "bcdfghjklmnpqrstvwxyz"
 en_letters :: String
 en_letters = en_vowels ++ en_consonants
 
@@ -37,7 +33,7 @@ isConsonant c
     
 \end{code}
 
-What follows is the cobbled together pile of shit that tries to count syllables.
+What follows is the roped, taped, and cobbled together pile of shit that tries to count syllables.
 
 It can't handle abbreviations or contractions
 
@@ -45,8 +41,7 @@ It has problems with things that end with "es", for example "toves"
 
 It has problems with certain adverbs, for example "barely" or "curiously." 
 
-Other suffixes also seem to present certain complications, for example "mastered." The issue is that sometimes the suffix creates an additional syllable, 
-as in "blasted," but other times it doesn't.
+Other suffixes also seem to present certain complications, for example "mastered." The issue is that sometimes the suffix creates an additional syllable, as in "blasted," but other times it doesn't.
 
 It seems like resolving these problems might require using a phonemic representation of words. 
 
@@ -90,8 +85,11 @@ IN WHICH WE TEST THINGS
 
 \begin{code}
 
-main :: IO ()
-main = syllableTests
+saySyllableCount :: String -> IO ()
+saySyllableCount str = do
+  let howManySylls = syllableCount str
+  putStrLn str
+  putStrLn (show howManySylls)
 
 syllableTests :: IO ()
 syllableTests = do

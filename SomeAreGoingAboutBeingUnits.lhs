@@ -29,9 +29,10 @@ One tries to start with some kind of atoms, or pick those pieces and then
 begin, knotting and knitting together the sorts of organized emptiness
 that you have decided to make your poetry of. Mathematicians choose the
 empty set, and walls of parenthesis; this binary builds nand-gates to dam
-and release flows of \'1\'s sliced into \'0\'s; the inventors of our
-language \'a\' through \'z,\' and its precursors, perhaps the dot and
-varying angles of line shoved and burnt into clay or wax.
+and release flows of \'1\'s that are really currents sliced into \'0\'s
+that are really not; the inventors of our language \'a\' through \'z,\'
+and its precursors, perhaps the dot and varying angles of line shoved and
+burnt into clay or wax.
 
 And there is speech in them we believe. Particularly, it is the possible
 language in these etchings, the ability of their yielding material to
@@ -85,6 +86,8 @@ instance PoemUnit LabeledWord where
 
 \end{code}
 
+And why just two?! Why not lists of twos of words:
+
 \begin{code}
 
 newtype LabeledPhrase = LabeledPhrase {the_phrase :: [LabeledWord]} deriving (Eq, Ord, Show)
@@ -100,10 +103,20 @@ instance PoemUnit LabeledPhrase where
 
 \end{code}
 
+In the end though we will write on something called trees - wrongly, as they
+are at best stick-figures of trees: bark stripped, forked and bent. The point
+of them though, here, is the ease of naming the whole of them and their
+pieces simultaneously, tree, forest, bark, trunk, and branch all at once. At
+the ends of one are words, which programmers and graph theorists ambitiously
+and maybe also pathetically call leaves, and after those, the named forking
+shapes of them. Unlike trees, a WordTree is constructed by attaching a plaque
+to a bunch of little WordTrees glued together (each a noun or a verb phrase,
+or a semicolon or a  new metaphor for despair). 
+
 \begin{code}
 
 data WordTree = WordLeaf {leaf_word :: String, what_kinds :: [String]}
-  | WordNode {branches :: [WordTree], what_kind :: [String]}
+  | WordNode {branches :: [WordTree], what_labels :: [String]}
     deriving (Eq, Ord, Show)
 
 writeTree :: WordTree -> String
@@ -113,7 +126,7 @@ writeTree (WordNode some_wordy_branches _) =
 
 instance PoemUnit WordTree where
   writeIt = writeTree
-  justWord = (\some_word -> WordLeaf some_word ["SomeWord"])
+  justWord = (\some_word -> WordLeaf some_word ["Word"])
   cellar_door = WordLeaf "cellar door" ["CellarDoor"]
 
 \end{code}
