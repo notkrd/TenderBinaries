@@ -1,11 +1,10 @@
-"And why special? 
-Not left straw, the chain’s the missing, was white winningly and 
-     occasion’s entirely strings. 
-Reason is sullenness: it’s there that practices left when six into 
-     nothing narrow, resolute, suggests all beside that plain seam. 
-Pencils, mutton, asparagus: the table there."
+"What do you mean by \emph{rashes of ash}? Is industry
+systematic work, assiduous activity, or ownership
+of factories? Is \emph{ripple} agitate lightly? Are
+we \emph{tossed} in tune when we write poems? And
+what or who \emph{emboss with gloss insignias of air}?"
 
--Jackson Mac Low, from "Stein 100: A Feather Likeness of the Justice Chair"
+-Charles Bernstein, from "A Test of Poetry"
 
 \begin{code}
 
