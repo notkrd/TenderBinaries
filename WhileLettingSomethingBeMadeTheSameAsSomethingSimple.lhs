@@ -20,7 +20,7 @@ import Array
 This page is intended as a sort of certification board for dictionaries. As the
 National Institute of Standards and Technology offers fully measured and certified
 peanut butter, here we give you some industrial quality, fully tested, nouns. But,
-the NIST's peanut butter is $835.00 a jar, and our nouns are provided free for the
+the NIST's peanut butter is \$835.00 a jar, and our nouns are provided free for the
 public good. 
 
 \begin{code}
