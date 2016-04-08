@@ -11,8 +11,9 @@ module SayingThingsAsAnEngineWould where
 
 import SomeAreGoingAboutBeingUnits
 import WhileLettingSomethingBeMadeTheSameAsSomethingSimple
-import System.Random
 import SomeAreBeingFlies
+
+import System.Random
 
 \end{code}
 
@@ -42,17 +43,19 @@ form in it.
 \begin{code}
 
 import Control.Monad
+import Control.Monad.State.Lazy
 
 \end{code}
 
 A monad is an odd specific wondrous technical thing. It does not paraphrase
 well. As the good Wikipedia tells it:
 
-If $C$ is a category, a  monad on $C$ consists of an endofunctor
+"If $C$ is a category, a  monad on $C$ consists of an endofunctor
 $T \colon C \to C$ together with two natural transformations:
 
-$\eta \colon 1_{C} \to T$ (where $1_{C}$ denotes the identity functor on $C$) and
-$\mu \colon T^{2} \to T$ (where $T^{2}$ is the functor $T \circ T$ from $C$ to $C$).
+$\eta \colon 1_{C} \to T$ (where $1_{C}$ denotes the identity functor on $C$)
+and $\mu \colon T^{2} \to T$ (where $T^{2}$ is the functor $T \circ T$ from
+$C$ to $C$).
 
 These are required to fulfill the following conditions (sometimes called
 coherence conditions):
@@ -60,12 +63,27 @@ $\mu \circ T\mu = \mu \circ \mu T$ (as natural transformations $T^{3} \to T$);
 $\mu \circ T \eta = \mu \circ \eta T = 1_{T}$
 
 (as natural transformations $T \to T$; here $1_{T}$ denotes the identity
-transformation from $T$ to $T$).
+transformation from $T$ to $T$)."
+
+As the fine, if at times a bit uptight, Haskell documentation would have
+it "Monads can be viewed as a standard programming interface to various
+data or control structures, which is captured by the Monad class."
 
 Paraphrase fails it, is at times i think, less accurate than silence or
-nonsense. But here, 
+nonsense. But here the monad will let us represent, as we intend to, a
+poem as a series of transformations: a monad, one of the main features
+of this programming language, gives a good framework for describing any
+of the things you could do with some odd pieces of a poem, all lost and
+left, and make new pieces, some approaching poetry. 
 
 \begin{code}
+
+data (Eq a, Ord a, Show a) => InAWorld a =
+  InAWorld {poem :: WordTree, lexicon :: TreeDict,
+            mysterious_insight :: StdGen, weather :: [String],
+            is_complete :: Bool}
+  deriving (Eq, Ord, Show)
+  
 
 \end{code}
 

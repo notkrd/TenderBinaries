@@ -43,7 +43,7 @@ this poem's first pieces.
 
 \begin{code}
 
-class (Eq a, Ord a) => PoemUnit a where
+class (Eq a, Ord a, Show a) => PoemUnit a where
   writeIt :: a -> String
   justWord :: String -> a
   cellar_door :: a
@@ -124,14 +124,6 @@ data WordTree = WordLeaf {leaf_word :: String, what_kinds :: [String]}
   | WordNode {branches :: [WordTree], what_labels :: [String]}
     deriving (Eq, Ord, Show)
 
-labelTree :: WordTree -> [String]
-labelTree (WordLeaf _ its_kinds) = its_kinds
-labelTree (WordNode _ its_labels) = its_labels
-
-potentiallyBranches :: WordTree -> [WordTree]
-potentiallyBranches (WordLeaf the_word the_names) = [WordLeaf the_word the_names]
-potentiallyBranches (WordNode the_branches _) = the_branches
-
 writeTree :: WordTree -> String
 writeTree (WordLeaf some_leafy_word _) = some_leafy_word
 writeTree (WordNode some_wordy_branches _) =
@@ -141,7 +133,20 @@ instance PoemUnit WordTree where
   writeIt = writeTree
   justWord = (\some_word -> WordLeaf some_word ["Word"])
   cellar_door = WordLeaf "cellar door" ["CellarDoor"]
-  
+
+\end{code}
+
+
+
+\begin{code}
+ 
+labelTree :: WordTree -> [String]
+labelTree (WordLeaf _ its_kinds) = its_kinds
+labelTree (WordNode _ its_labels) = its_labels
+
+potentiallyBranches :: WordTree -> [WordTree]
+potentiallyBranches (WordLeaf the_word the_names) = [WordLeaf the_word the_names]
+potentiallyBranches (WordNode the_branches _) = the_branches
 
 flattenTree :: WordTree -> WordTree
 flattenTree (WordLeaf a_word words_for_it) = (WordLeaf a_word words_for_it)
