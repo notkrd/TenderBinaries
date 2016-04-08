@@ -5,7 +5,9 @@ kawazu tobikomu
 mizu no oto"
 -Matsuo Basho
 
-This code is disgusting and should be stopped. Syllable counting is an aesthetically and spiritually bankrupt practice, and should be gently mocked. Nonetheless, here we are, counting syllables.
+This code is disgusting and should be stopped. Syllable counting is an 
+aesthetically and spiritually bankrupt practice, and should be gently 
+mocked. Nonetheless, here we are, counting syllables.
 
 \begin{code}
 
@@ -33,7 +35,11 @@ isConsonant c
     
 \end{code}
 
-What follows is the roped, taped, and cobbled together pile of shit that tries to count syllables.
+What follows is the roped, taped, and cobbled together pile of shit that 
+tries to count syllables.
+
+Unfortunate plumbing, rusting below signification. It's too far down for
+me to polish up, make something story-shaped out of.
 
 It can't handle abbreviations or contractions
 
@@ -41,9 +47,12 @@ It has problems with things that end with "es", for example "toves"
 
 It has problems with certain adverbs, for example "barely" or "curiously." 
 
-Other suffixes also seem to present certain complications, for example "mastered." The issue is that sometimes the suffix creates an additional syllable, as in "blasted," but other times it doesn't.
+Other suffixes also seem to present certain complications, for example 
+"mastered." The issue is that sometimes the suffix creates an additional 
+syllable, as in "blasted," but other times it doesn't.
 
-It seems like resolving these problems might require using a phonemic representation of words. 
+It seems like resolving these problems might require using a phonemic 
+representation of words. 
 
 \begin{code}
 
@@ -71,7 +80,7 @@ syllableCountHelper (x : y : z : "")
     | (x == 'e') && (y == 'l') && (z == 'y') = 1
     | (isVowel x) && (isConsonant y) = 1 + syllableCountHelper(y : z : "")
     | otherwise = syllableCountHelper (y : z : "")
-syllableCountHelper (x : y : z: s)
+syllableCountHelper (x : y : z : s)
     | not (isLetter z) = syllableCountHelper(x : y : "") + syllableCountHelper(s)
     | not (isLetter y) = syllableCountHelper(x : "") + syllableCountHelper(z : s)
     | not (isLetter x) = syllableCountHelper(y : z : s)

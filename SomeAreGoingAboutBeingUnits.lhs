@@ -17,11 +17,13 @@ haze, dioxin, and days; days
 exist, days and death; and poems
 exist; poems, days, death"
 
--Inger Christensen, \emph{Alphabet}
+-Inger Christensen, from \emph{Alphabet} trans. by Susanna Nied
 
 \begin{code}
 
 module SomeAreGoingAboutBeingUnits where
+
+import Data.List
 
 \end{code}
 
@@ -48,7 +50,8 @@ class (Eq a, Ord a) => PoemUnit a where
 
 \end{code}
 
-
+One kind of word is a word. By "word" here we mean a simply-linked list
+of unicode characters, as explained in The Prelude.
 
 \begin{code}
 
@@ -106,18 +109,28 @@ instance PoemUnit LabeledPhrase where
 In the end though we will write on something called trees - wrongly, as they
 are at best stick-figures of trees: bark stripped, forked and bent. The point
 of them though, here, is the ease of naming the whole of them and their
-pieces simultaneously, tree, forest, bark, trunk, and branch all at once. At
-the ends of one are words, which programmers and graph theorists ambitiously
+pieces simultaneously, tree, forest, bark, trunk, and branch all at once.
+
+At the ends of one are words, which programmers and graph theorists ambitiously
 and maybe also pathetically call leaves, and after those, the named forking
 shapes of them. Unlike trees, a WordTree is constructed by attaching a plaque
-to a bunch of little WordTrees glued together (each a noun or a verb phrase,
-or a semicolon or a  new metaphor for despair). 
+to a bunch of little WordTrees glued together (each a noun or a verb phrase, or
+a semicolon or a new metaphor for despair) at a WordNode. For us, a leaf is a
+tree.
 
 \begin{code}
 
 data WordTree = WordLeaf {leaf_word :: String, what_kinds :: [String]}
   | WordNode {branches :: [WordTree], what_labels :: [String]}
     deriving (Eq, Ord, Show)
+
+labelTree :: WordTree -> [String]
+labelTree (WordLeaf _ its_kinds) = its_kinds
+labelTree (WordNode _ its_labels) = its_labels
+
+potentiallyBranches :: WordTree -> [WordTree]
+potentiallyBranches (WordLeaf the_word the_names) = [WordLeaf the_word the_names]
+potentiallyBranches (WordNode the_branches _) = the_branches
 
 writeTree :: WordTree -> String
 writeTree (WordLeaf some_leafy_word _) = some_leafy_word
@@ -128,13 +141,31 @@ instance PoemUnit WordTree where
   writeIt = writeTree
   justWord = (\some_word -> WordLeaf some_word ["Word"])
   cellar_door = WordLeaf "cellar door" ["CellarDoor"]
+  
 
+flattenTree :: WordTree -> WordTree
+flattenTree (WordLeaf a_word words_for_it) = (WordLeaf a_word words_for_it)
+flattenTree (WordNode all_branches overall_labels) =
+  (WordNode (concat (map (potentiallyBranches . flattenTree) all_branches))
+  (foldr (\some_branch some_labels -> union ((labelTree . flattenTree) some_branch) some_labels)
+   overall_labels
+   (map flattenTree all_branches)))
+  
 \end{code}
+
+We ought to look at one or two, under some controversial microscope.
 
 \begin{code}
 
-main :: IO()
-main = do
-  putStrLn (writeIt (StringUnit "nope"))
-
+unit_tests :: IO()
+unit_tests = do
+  putStrLn (writeIt ((justWord :: String -> StringUnit) "cellar-door"))
+  putStrLn (writeIt ((justWord :: String -> LabeledWord) "cellar-door"))
+  putStrLn (writeIt ((justWord :: String -> LabeledPhrase) "cellar-door"))
+  putStrLn (writeIt ((justWord :: String -> WordTree) "cellar-door"))
+  putStrLn (writeIt (cellar_door :: StringUnit))
+  putStrLn (writeIt (cellar_door :: LabeledWord))
+  putStrLn (writeIt (cellar_door :: LabeledPhrase))
+  putStrLn (writeIt (cellar_door :: WordTree))
+  
 \end{code}

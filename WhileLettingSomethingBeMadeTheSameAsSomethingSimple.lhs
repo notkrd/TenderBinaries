@@ -14,54 +14,103 @@ for this, or known that we would someday need one, and wished to help."
 module WhileLettingSomethingBeMadeTheSameAsSomethingSimple where
 
 import SomeAreGoingAboutBeingUnits
-import Array
+import Data.Array.IArray
 \end{code}
 
 This page is intended as a sort of certification board for dictionaries. As the
 National Institute of Standards and Technology offers fully measured and certified
 peanut butter, here we give you some industrial quality, fully tested, nouns. But,
-the NIST's peanut butter is \$835.00 a jar, and our nouns are provided free for the
+the NIST's peanut butter is \$835.00 a jar, and our nouns are provided free, for the
 public good. 
 
 \begin{code}
 
-jabber_dict :: [String]
-jabber_dict = ["twas","brillig","and","the","slithy","toves","did","gyre","and","gimble","in","the","wabes","all","mimsy","were","the","borogroves","and","the","mome","raths","outgrabe"]
+jabber_words :: [String]
+jabber_words = ["twas","brillig","and","the","slithy","toves","did","gyre","and","gimble","in","the","wabes","all","mimsy","were","the","borogroves","and","the","mome","raths","outgrabe"]
 
-jabber_dict_just :: [StringUnit]
-jabber_dict_just = map justWord jabber_dict
+jabber_words_just :: [StringUnit]
+jabber_words_just = map justWord jabber_words
 
-jabber_adj_dict :: [WordTree]
-jabber_adj_dict = map (\wrd -> WordLeaf wrd ["A","Word"]) ["brillig","slithy","mimsy","mome"]
+jabber_adj_tree :: WordTree
+jabber_adj_tree =
+  (WordNode (map (\wrd -> WordLeaf wrd ["A","Word"])
+             ["brillig","slithy","mimsy","mome"])
+   ["A","Dict","Jabberwocky"])
 
-jabber_noun_dict :: [WordTree]
-jabber_noun_dict = map (\wrd -> WordLeaf wrd ["N","Word"]) ["toves","wabes","borogroves","raths"]
+jabber_noun_tree :: WordTree
+jabber_noun_tree =
+  (WordNode (map (\wrd -> WordLeaf wrd ["N","Word"])
+             ["toves","wabes","borogroves","raths"])
+   ["N","Dict","Jabberwocky"])
 
-jabber_verb_dict :: [WordTree]
-jabber_verb_dict = map (\wrd -> WordLeaf wrd ["V","Word"]) ["gyre","gymbal","were","outgrabe"]
+jabber_verb_tree :: WordTree
+jabber_verb_tree =
+  (WordNode (map (\wrd -> WordLeaf wrd ["V","Word"])
+            ["gyre","gymbal","were","outgrabe"])
+   ["V","Dict","Jabberwocky"])
 
-jabber_misc_dict :: [WordTree]
-jabber_misc_dict = map (\wrd -> WordLeaf wrd [wrd,"Word"]) ["twas", "and", "the", "did", "in", "all", "were"]
+jabber_misc_tree :: WordTree
+jabber_misc_tree =
+  (WordNode (map (\wrd -> WordLeaf wrd [wrd,"Word"])
+            ["twas", "and", "the", "did", "in", "all", "were"])
+   ["Closed-Cat","Dict","Jabberwocky"])
 
-jabber_dict_labeled :: [WordTree]
-jabber_dict_labeled = concat [jabber_adj_dict, jabber_noun_dict, jabber_verb_dict, jabber_misc_dict]
-
-jabber_tree = WordNode jabber_dict_labeled ["Dict"]
+jabber_tree :: WordTree
+jabber_tree =
+  (WordNode [jabber_adj_tree, jabber_noun_tree, jabber_verb_tree, jabber_misc_tree]
+   ["Dict","Jabberwocky"])
 
 \end{code}
 
 Lists are made a word at a time. Arrays are made with all words at once. Arrays
 are faster to extract pieces from than lists (but harder to change). Dictionaries,
-once made, stay fixed for a year or two, and we can leave their changing to certain
-slow experts. 
+once made, stay unedited for a year or two, and we can leave their modification to
+certain slow experts. As such, they are easily flipped through, by index or by
+cut out finger ellows, with embossed lettering, in search of your word. You've got
+to first know how to start spelling it though.
 
 \begin{code}
 
 data TreeDict = DictEntry {simply_word :: String, what_kinds :: [String]}
-  | DictSection {parts :: TreeDict, what_labels :: [String]}
+  | DictSection {parts :: Array Int TreeDict, what_labels :: [String]}
+    deriving (Eq, Ord, Show)
 
 treeToDict :: WordTree -> TreeDict
-treeToDict WordLeaf its_word its_kinds = DictEntry its_word its_kinds
-treeToDict 
+treeToDict (WordLeaf its_word its_kinds) = DictEntry its_word its_kinds
+treeToDict (WordNode the_word_trees labels) =
+  DictSection (listArray (0, ((length the_word_trees) - 1)) (map treeToDict the_word_trees)) labels
+
+dictToTree :: TreeDict -> WordTree
+dictToTree (DictEntry its_word its_kinds) = WordLeaf its_word its_kinds
+dictToTree (DictSection its_parts its_labels) =
+  WordNode (map dictToTree (elems its_parts)) its_labels
+
+instance PoemUnit TreeDict where
+  writeIt = writeIt . dictToTree
+  justWord = treeToDict . justWord
+  cellar_door = treeToDict cellar_door
+
+flattenDict :: TreeDict -> TreeDict
+flattenDict = treeToDict . flattenTree . dictToTree
+
+jabber_dict = treeToDict jabber_tree
+
+\end{code}
+
+Some people say they like to read the dicitonary, though the rest of us tend to
+suspect that they're just trying (and ineffectively at that) to show off. 
+
+\begin{code}
+
+dict_tests :: IO()
+dict_tests = do
+  putStrLn (show jabber_words)
+  putStrLn (concat jabber_words)
+  putStrLn (show jabber_tree)
+  putStrLn (writeIt jabber_tree)
+  putStrLn (show jabber_dict)
+  putStrLn (writeIt jabber_dict)
+  putStrLn (show (flattenDict jabber_dict))
+  putStrLn (writeIt (flattenDict jabber_dict))
 
 \end{code}
