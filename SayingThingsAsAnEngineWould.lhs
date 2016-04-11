@@ -37,13 +37,12 @@ reveal a mathematical text as clear or elegant or beautiful.
 One of the things art does, maybe the main one, is to interrogate structure:
 to transform questions and anxieties about various kinds of patterned and
 rule-constrained or shared experience (law, ritual, care, the repetitions of
-tragedy and loss, biology, "small talk") into questions about language and of
+tragedy and loss, biology, small talk) into questions about language and of
 form in it.
 
 \begin{code}
 
 import Control.Monad
-import Control.Monad.State.Lazy
 
 \end{code}
 
@@ -74,16 +73,49 @@ nonsense. But here the monad will let us represent, as we intend to, a
 poem as a series of transformations: a monad, one of the main features
 of this programming language, gives a good framework for describing any
 of the things you could do with some odd pieces of a poem, all lost and
-left, and make new pieces, some approaching poetry. 
+left, and make new pieces, some approaching poetry.
+
+What it will do is gather together the bits of information, outside of
+the poem, that will direct its composition. 
 
 \begin{code}
 
-data (Eq a, Ord a, Show a) => InAWorld a =
+data InAWorld a =
   InAWorld {poem :: WordTree, lexicon :: TreeDict,
             mysterious_insight :: StdGen, weather :: [String],
-            is_complete :: Bool}
-  deriving (Eq, Ord, Show)
+            notes :: [String], is_complete :: Bool,
+            the_thing :: a}
   
+theWorldRemains :: (a -> b) -> InAWorld a -> InAWorld b
+theWorldRemains f thing_in_world =
+  thing_in_world {the_thing = f (the_thing thing_in_world)}
+
+instance Functor InAWorld where
+  fmap = theWorldRemains
+
+\end{code}
+
+What contexts to place some object into? A choice of dictionary, first
+facts, a Mysterious Force of Poetic Insight, the standard situations
+to direct its growths around?
+
+\begin{code}
+
+empty_poem :: WordTree
+empty_poem = WordLeaf "" ["EMPTY"]
+
+global_dict :: TreeDict
+global_dict = jabber_dict
+
+first_surprise :: StdGen
+first_surprise = mkStdGen 1729
+
+takeOutside :: a -> InAWorld a
+takeOutside a =
+  InAWorld empty_poem global_dict
+   first_surprise []
+   [] False
+   a
 
 \end{code}
 
@@ -98,10 +130,10 @@ the elephant a paintbrush.
 
 Well a group of mathematicians are presented an elephant – and the
 topologist examines its surface and concludes that the elephant is
-essentially a donut with 7 or 8 holes. The group theorists kicks the animal
+essentially a donut with 7 or 8 holes. The group theorist kicks the animal
 from various directions, does nothing, pulls at its trunk and watches the
 elephant whine and kick, then describes the collection of things a person
-can cause an elephant to do. The calculus students draws a bunch of
+can cause an elephant to do. The calculus student draws a bunch of
 rectangles and decides that the elephant weighs around 2.734 tonnes and takes
 up 9.72 cubic meters. The category theorist climbs onto its back and observes
 that elephants can be used as modes of transportation, and that elephants are
@@ -116,7 +148,48 @@ elephants as big as the first one. You couldn\'t exactly say that between
 them you have an elephant, but they have all these new views of the thing.
 The method of math, as a way of understanding the world, is of selective
 blindness, of ignoring everything about something except a few of its
-formally described properties. And maybe it\'s better to just say, “elephant”
+formally described properties. And maybe it\'s better to just say, "elephant"
 and stop there, but I think the groping blind people discover something I
 would never have noticed otherwise – that a tail can work like a brush, and
 that the elephant\'s trunk, if you look at it right, is just like a snake.
+
+\begin{code}
+
+poemBind :: InAWorld a -> (a -> InAWorld b) -> InAWorld b
+poemBind thing_in_world funcIntoWorld =
+  let ((InAWorld a_poem a_lex
+          an_insight a_weather some_notes a_completion
+          a_thing),
+       (InAWorld b_poem b_lex
+       b_insight b_weather b_notes b_completion
+       b_thing)) = (thing_in_world, (funcIntoWorld a_thing)) in
+  funcIntoWorld a_thing
+
+\end{code}
+
+instance Monad InAWorld where
+  return = takeOutside
+
+
+\begin{code}
+
+actRandomly :: (a -> StdGen -> (b, StdGen)) -> InAWorld a -> InAWorld b
+actRandomly theActs thing_in_world =
+  thing_in_world {the_thing = (fst (theActs (the_thing thing_in_world)
+                                   (mysterious_insight thing_in_world))),
+                 mysterious_insight = (snd (theActs (the_thing thing_in_world)
+                                           (mysterious_insight thing_in_world)))}
+
+grabABranch :: InAWorld WordTree -> InAWorld WordTree
+grabABranch = actRandomly randomBranch
+
+grabALeaf :: InAWorld WordTree -> InAWorld WordTree
+grabALeaf = actRandomly randomLeaf
+
+openASection :: InAWorld TreeDict -> InAWorld TreeDict
+openASection = actRandomly randomSection
+
+openAnEntry :: InAWorld TreeDict -> InAWorld TreeDict
+openAnEntry = actRandomly randomEntry
+
+\end{code}

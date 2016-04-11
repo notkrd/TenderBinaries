@@ -152,9 +152,16 @@ flattenTree :: WordTree -> WordTree
 flattenTree (WordLeaf a_word words_for_it) = (WordLeaf a_word words_for_it)
 flattenTree (WordNode all_branches overall_labels) =
   (WordNode (concat (map (potentiallyBranches . flattenTree) all_branches))
-  (foldr (\some_branch some_labels -> union ((labelTree . flattenTree) some_branch) some_labels)
+  (foldr (\some_branch some_labels ->
+           union ((labelTree . flattenTree) some_branch) some_labels)
    overall_labels
    (map flattenTree all_branches)))
+
+(/\+/\) :: WordTree -> WordTree -> WordTree
+(/\+/\) first_tree second_tree =
+  WordNode ((potentiallyBranches first_tree)
+            ++ (potentiallyBranches second_tree))
+  ((labelTree first_tree) ++ (labelTree second_tree))
   
 \end{code}
 

@@ -21,12 +21,64 @@ This page is intended as a sort of certification board for dictionaries. As the
 National Institute of Standards and Technology offers fully measured and certified
 peanut butter, here we give you some industrial quality, fully tested, nouns. But,
 the NIST's peanut butter is \$835.00 a jar, and our nouns are provided free, for the
-public good. 
+public good.
+
+\begin{code}
+
+data TreeDict = DictEntry {simply_word :: String, what_kinds :: [String]}
+  | DictSection {parts :: Array Int TreeDict, what_labels :: [String]}
+    deriving (Eq, Ord, Show)
+
+\end{code}
+
+Lists are made a word at a time. Arrays are made with all words at once. Arrays
+are faster to extract pieces from than lists (but harder to change). Dictionaries,
+once made, stay unedited for a year or two, and we can leave their modification to
+certain slow experts. As such, they are easily flipped through, by index or by
+cut out finger ellows, with embossed lettering, in search of your word. You've got
+to first know how to start spelling it though.
+
+\begin{code}
+
+treeToDict :: WordTree -> TreeDict
+treeToDict (WordLeaf its_word its_kinds) =
+  DictEntry its_word its_kinds
+treeToDict (WordNode the_word_trees labels) =
+  DictSection (listArray (0, ((length the_word_trees) - 1))
+               (map treeToDict the_word_trees)) labels
+
+dictToTree :: TreeDict -> WordTree
+dictToTree (DictEntry its_word its_kinds) = WordLeaf its_word its_kinds
+dictToTree (DictSection its_parts its_labels) =
+  WordNode (map dictToTree (elems its_parts)) its_labels
+
+instance PoemUnit TreeDict where
+  writeIt = writeIt . dictToTree
+  justWord = treeToDict . justWord
+  cellar_door = treeToDict cellar_door
+
+flattenDict :: TreeDict -> TreeDict
+flattenDict = treeToDict . flattenTree . dictToTree
+
+(||+||) :: TreeDict -> TreeDict -> TreeDict
+(||+||) first_dict second_dict =
+  treeToDict ((dictToTree first_dict)
+              /\+/\ (dictToTree second_dict))
+
+jabber_dict = treeToDict jabber_tree
+
+\end{code}
+
+We'll set our dictionary makers to their index card researches
+in some dim but windowed room. 
 
 \begin{code}
 
 jabber_words :: [String]
-jabber_words = ["twas","brillig","and","the","slithy","toves","did","gyre","and","gimble","in","the","wabes","all","mimsy","were","the","borogroves","and","the","mome","raths","outgrabe"]
+jabber_words = ["twas","brillig","and","the","slithy","toves",
+                "did","gyre","and","gimble","in","the","wabe",
+                "all","mimsy","were","the","borogroves",
+                "and","the","mome","raths","outgrabe"]
 
 jabber_words_just :: [StringUnit]
 jabber_words_just = map justWord jabber_words
@@ -40,7 +92,7 @@ jabber_adj_tree =
 jabber_noun_tree :: WordTree
 jabber_noun_tree =
   (WordNode (map (\wrd -> WordLeaf wrd ["N","Word"])
-             ["toves","wabes","borogroves","raths"])
+             ["toves","wabe","borogroves","raths"])
    ["N","Dict","Jabberwocky"])
 
 jabber_verb_tree :: WordTree
@@ -62,42 +114,7 @@ jabber_tree =
 
 \end{code}
 
-Lists are made a word at a time. Arrays are made with all words at once. Arrays
-are faster to extract pieces from than lists (but harder to change). Dictionaries,
-once made, stay unedited for a year or two, and we can leave their modification to
-certain slow experts. As such, they are easily flipped through, by index or by
-cut out finger ellows, with embossed lettering, in search of your word. You've got
-to first know how to start spelling it though.
-
-\begin{code}
-
-data TreeDict = DictEntry {simply_word :: String, what_kinds :: [String]}
-  | DictSection {parts :: Array Int TreeDict, what_labels :: [String]}
-    deriving (Eq, Ord, Show)
-
-treeToDict :: WordTree -> TreeDict
-treeToDict (WordLeaf its_word its_kinds) = DictEntry its_word its_kinds
-treeToDict (WordNode the_word_trees labels) =
-  DictSection (listArray (0, ((length the_word_trees) - 1)) (map treeToDict the_word_trees)) labels
-
-dictToTree :: TreeDict -> WordTree
-dictToTree (DictEntry its_word its_kinds) = WordLeaf its_word its_kinds
-dictToTree (DictSection its_parts its_labels) =
-  WordNode (map dictToTree (elems its_parts)) its_labels
-
-instance PoemUnit TreeDict where
-  writeIt = writeIt . dictToTree
-  justWord = treeToDict . justWord
-  cellar_door = treeToDict cellar_door
-
-flattenDict :: TreeDict -> TreeDict
-flattenDict = treeToDict . flattenTree . dictToTree
-
-jabber_dict = treeToDict jabber_tree
-
-\end{code}
-
-Some people say they like to read the dicitonary, though the rest of us tend to
+Some people say they like to read the dictionary, though the rest of us tend to
 suspect that they're just trying (and ineffectively at that) to show off. 
 
 \begin{code}
