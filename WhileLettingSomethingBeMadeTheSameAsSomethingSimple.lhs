@@ -57,13 +57,28 @@ instance PoemUnit TreeDict where
   justWord = treeToDict . justWord
   cellar_door = treeToDict cellar_door
 
+empty_dict :: TreeDict
+empty_dict = treeToDict empty_tree
+
+dict_has :: (TreeDict -> Bool) -> TreeDict -> Bool
+dict_has the_test (DictEntry a_word its_kinds) =
+  the_test (DictEntry a_word its_kinds)
+dict_has the_test (DictSection sub_sections its_kinds) =
+  the_test (DictSection sub_sections its_kinds) ||
+  (foldr (\a_dict a_bool -> (the_test a_dict) || a_bool) false sub_sections)
+
 flattenDict :: TreeDict -> TreeDict
 flattenDict = treeToDict . flattenTree . dictToTree
 
 (||+||) :: TreeDict -> TreeDict -> TreeDict
-(||+||) first_dict second_dict =
-  treeToDict ((dictToTree first_dict)
+(||+||) first_dict second_dict
+  | first_dict == empty_dict = second_dict
+  | second_dict == empty_dict = first_dict
+  | otherwise = treeToDict ((dictToTree first_dict)
               /\+/\ (dictToTree second_dict))
+
+concatDicts :: [TreeDict] -> TreeDict
+concatDicts = treeToDict . concatTrees . (map dictToTree)
 
 jabber_dict = treeToDict jabber_tree
 

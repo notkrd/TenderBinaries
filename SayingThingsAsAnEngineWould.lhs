@@ -14,6 +14,8 @@ import WhileLettingSomethingBeMadeTheSameAsSomethingSimple
 import SomeAreBeingFlies
 
 import System.Random
+import Data.Set (Set)
+import qualified Data.Set as Set
 
 \end{code}
 
@@ -82,7 +84,7 @@ the poem, that will direct its composition.
 
 data InAWorld a =
   InAWorld {poem :: WordTree, lexicon :: TreeDict,
-            mysterious_insight :: StdGen, weather :: [String],
+            mysterious_insight :: StdGen, weather :: Set String,
             notes :: [String], is_complete :: Bool,
             the_thing :: a}
   
@@ -102,7 +104,7 @@ to direct its growths around?
 \begin{code}
 
 empty_poem :: WordTree
-empty_poem = WordLeaf "" ["EMPTY"]
+empty_poem = empty_tree
 
 global_dict :: TreeDict
 global_dict = jabber_dict
@@ -113,7 +115,7 @@ first_surprise = mkStdGen 1729
 takeOutside :: a -> InAWorld a
 takeOutside a =
   InAWorld empty_poem global_dict
-   first_surprise []
+   first_surprise Set.empty
    [] False
    a
 
@@ -158,18 +160,20 @@ that the elephant\'s trunk, if you look at it right, is just like a snake.
 poemBind :: InAWorld a -> (a -> InAWorld b) -> InAWorld b
 poemBind thing_in_world funcIntoWorld =
   let ((InAWorld a_poem a_lex
-          an_insight a_weather some_notes a_completion
+          an_insight a_weather
+          some_notes a_completion
           a_thing),
        (InAWorld b_poem b_lex
-       b_insight b_weather b_notes b_completion
-       b_thing)) = (thing_in_world, (funcIntoWorld a_thing)) in
-  funcIntoWorld a_thing
+       b_insight b_weather
+       b_notes b_completion
+       b_thing)) =
+        (thing_in_world, (funcIntoWorld a_thing)) in
+  (InAWorld (a_poem /\+/\ b_poem) a_lex
+   b_insight (Set.union a_weather b_weather)
+   (some_notes ++ b_notes) False
+   b_thing)
 
 \end{code}
-
-instance Monad InAWorld where
-  return = takeOutside
-
 
 \begin{code}
 

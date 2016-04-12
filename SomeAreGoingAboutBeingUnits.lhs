@@ -136,10 +136,23 @@ instance PoemUnit WordTree where
 
 \end{code}
 
-
+The value of trees is in their bark, nuts, holding of air, the root, the
+fruit, the blossoms, the trunk. After metaphor fails, this data structure
+is useful because  it represents the heirarchies of standard syntax, and
+lets us combine, flatten, and otherwise manipulate them. If you diagrammed
+sentences with bright underlines and thin boxes indicating potential (if
+perhaps imagined or invented) verbs, subjects and prepositions, you'd
+be making "trees" in the woodless, totally thin, impossible and
+untouchable sense. My understanding is that they are also relatively quick
+and efficient to manipulate in the ways that we intend to, but words are
+small systems of symbols and as such we need not worry overmuch about
+that.
 
 \begin{code}
- 
+
+empty_tree :: WordTree
+empty_tree = WordLeaf "" ["Empty"]
+  
 labelTree :: WordTree -> [String]
 labelTree (WordLeaf _ its_kinds) = its_kinds
 labelTree (WordNode _ its_labels) = its_labels
@@ -162,6 +175,14 @@ flattenTree (WordNode all_branches overall_labels) =
   WordNode ((potentiallyBranches first_tree)
             ++ (potentiallyBranches second_tree))
   ((labelTree first_tree) ++ (labelTree second_tree))
+
+concatTrees :: [WordTree] -> WordTree
+concatTrees word_trees =
+  foldr (\some_tree big_tree -> some_tree /\+/\ big_tree) empty_tree word_trees
+
+joinTrees :: [WordTree] -> WordTree
+joinTrees word_trees =
+  WordNode word_trees ["Join"]
   
 \end{code}
 
