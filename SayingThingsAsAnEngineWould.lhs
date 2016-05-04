@@ -40,10 +40,14 @@ One of the things art does, maybe the main one, is to interrogate structure:
 to transform questions and anxieties about various kinds of patterned and
 rule-constrained or shared experience (law, ritual, care, the repetitions of
 tragedy and loss, biology, small talk) into questions about language and of
-form in it.
+form in it. Because i do think we are caught in form and directed by it;
+that "form" is a good word with which to begin describing the thing that we
+are caught in.
+
 
 \begin{code}
 
+import Data.Functor
 import Control.Monad
 
 \end{code}
@@ -72,19 +76,18 @@ data or control structures, which is captured by the Monad class."
 
 Paraphrase fails it, is at times i think, less accurate than silence or
 nonsense. But here the monad will let us represent, as we intend to, a
-poem as a series of transformations: a monad, one of the main features
-of this programming language, gives a good framework for describing any
-of the things you could do with some odd pieces of a poem, all lost and
-left, and make new pieces, some approaching poetry.
-
-What it will do is gather together the bits of information, outside of
-the poem, that will direct its composition. 
+poem as a series of transformations: What it will do is gather together
+the bits of information, outside of the poem, that will direct its
+composition. A monad, one of the main features of this programming
+language, gives a good framework for describing any of the things you
+could do with some odd pieces of a poem, all lost and left, and make
+new pieces, some approaching poetry.
 
 \begin{code}
 
 data InAWorld a =
-  InAWorld {poem :: WordTree, lexicon :: TreeDict,
-            mysterious_insight :: StdGen, weather :: Set String,
+  InAWorld {lexicon :: TreeDict, mysterious_insight :: StdGen,
+            weather :: Set String,
             notes :: [String], is_complete :: Bool,
             the_thing :: a}
   
@@ -103,77 +106,72 @@ to direct its growths around?
 
 \begin{code}
 
-empty_poem :: WordTree
-empty_poem = empty_tree
-
 global_dict :: TreeDict
 global_dict = jabber_dict
 
 first_surprise :: StdGen
 first_surprise = mkStdGen 1729
 
+\end{code}
+
+Intending to or not, even intending not to, i find myself taking on this
+explaining voice: as though I were some kind of professor or new lecturing
+acquaintance at a party. This register presupposes that the code is some
+collection of totally clear and precise ideas, and the rest of it just an
+explanation of those ideas. Then, it's 'literary' in so far as the
+explanations are codes constructed out of occasionaly imagistic metaphors -
+but the goal of the language is, still, to produce explanations that
+precisely parallel the mathematical and algorithmic goings on, yet are more
+readily parsed and digested by a reader's English-speaking mind.
+
+I would like some other kind of explanation, that doesn't actualy describe
+the explained object but still, somehow, sketches its landscape. Sometimes,
+this is what i imagine fiction or poetry doing: somehow, at the end of the
+story, you find yourself left, after reading this accumulation of irrelevant
+noun-phrases and unreal events, with the sense of some way of looking or
+pattern of meaning-making through which to look at, to speak of some
+as-yet unspoken pieces of, this world here.
+
+\begin{code}
+
 takeOutside :: a -> InAWorld a
 takeOutside a =
-  InAWorld empty_poem global_dict
+  InAWorld global_dict
    first_surprise Set.empty
    [] False
    a
 
-\end{code}
-
-
-There\’s a story, I think first Buddhist, where a group of blind people are
-shown an elephant. The first one feels its head, and says “an elephant is
-like a pot, it is round and rough.” The second one feels its ear and says
-“it is like a winnowing basket” (whatever that is). Someone else feels its
-tusk and explains that it’s like a plough, a fourth one holds the creature’s
-trunk and claims it\'s a kind of snake, and another feels its tail and calls
-the elephant a paintbrush.
-
-Well a group of mathematicians are presented an elephant – and the
-topologist examines its surface and concludes that the elephant is
-essentially a donut with 7 or 8 holes. The group theorist kicks the animal
-from various directions, does nothing, pulls at its trunk and watches the
-elephant whine and kick, then describes the collection of things a person
-can cause an elephant to do. The calculus student draws a bunch of
-rectangles and decides that the elephant weighs around 2.734 tonnes and takes
-up 9.72 cubic meters. The category theorist climbs onto its back and observes
-that elephants can be used as modes of transportation, and that elephants are
-really the same as a subcategory of the category of vehicles. The geometer
-wonders what it would be like to live on the elephants hide, and gives
-directions for the quickest way to get from its ear to its trunk. The set
-theorist walks up to it and concludes there is an elephant, walks around and
-concludes that there isn\'t elephant everywhere, then demonstrates that if
-she could break it into a few hundred pieces, without stretching or changing
-the pieces in any way she could put the pieces back together into two
-elephants as big as the first one. You couldn\'t exactly say that between
-them you have an elephant, but they have all these new views of the thing.
-The method of math, as a way of understanding the world, is of selective
-blindness, of ignoring everything about something except a few of its
-formally described properties. And maybe it\'s better to just say, "elephant"
-and stop there, but I think the groping blind people discover something I
-would never have noticed otherwise – that a tail can work like a brush, and
-that the elephant\'s trunk, if you look at it right, is just like a snake.
-
-\begin{code}
-
 poemBind :: InAWorld a -> (a -> InAWorld b) -> InAWorld b
 poemBind thing_in_world funcIntoWorld =
-  let ((InAWorld a_poem a_lex
+  let ((InAWorld a_lex
           an_insight a_weather
           some_notes a_completion
           a_thing),
-       (InAWorld b_poem b_lex
+       (InAWorld b_lex
        b_insight b_weather
        b_notes b_completion
        b_thing)) =
         (thing_in_world, (funcIntoWorld a_thing)) in
-  (InAWorld (a_poem /\+/\ b_poem) a_lex
+  (InAWorld a_lex
    b_insight (Set.union a_weather b_weather)
    (some_notes ++ b_notes) False
    b_thing)
 
+instance Monad InAWorld where
+  (>>=) = poemBind
+  return = takeOutside
+  
 \end{code}
+
+Imagine 3 or 4 people - let's go with 4 - in a room. The walls are
+almost-white, almost-yellow, and on parallel sides pictured and postered
+over. One of them is sitting on the bed in the far corner, her feet
+rolled under her. It is not that she is sitting this way now, or that he
+is necessarily leaning with raised teacup against the closet wall, or
+even that they sit uniquely in the chair under the window, folder and
+pencil out, but that when you think about the 4 of you, you find
+yourselves in that 2/3 underground room with her tucked into the corner
+and under her laptop. Where is this room now, where do you sit?
 
 \begin{code}
 

@@ -65,7 +65,7 @@ dict_has the_test (DictEntry a_word its_kinds) =
   the_test (DictEntry a_word its_kinds)
 dict_has the_test (DictSection sub_sections its_kinds) =
   the_test (DictSection sub_sections its_kinds) ||
-  (foldr (\a_dict a_bool -> (the_test a_dict) || a_bool) false sub_sections)
+  (foldr (\a_dict a_bool -> (the_test a_dict) || a_bool) False (elems sub_sections))
 
 flattenDict :: TreeDict -> TreeDict
 flattenDict = treeToDict . flattenTree . dictToTree
